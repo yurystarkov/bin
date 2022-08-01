@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+# batd: low battery level alert
+# depends on xbacklight(1) and apm(1)
+#
+# by yury; in the public domain
+
+set -euf
+
+bat_lvl=$(apm -l)
+
+[ "$bat_lvl" = 'unknown' ] || [ "$bat_lvl" -gt 5 ] && exit 0
+
+export DISPLAY=:0
+
+for bri in 0 50 0 50; do
+  xbacklight -set "$bri"
+done
+
+exit 1

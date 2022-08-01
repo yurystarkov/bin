@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+# ram[en]: memory usage
+#
+# by yury; in the public domain
+
+mem_full=$(($(sysctl -n hw.physmem) / 1024 / 1024))
+
+while read -r _ _ line _; do
+  mem_used=${line%%M}
+done <<-EOF
+  $(vmstat)
+EOF
+
+printf '%sM / %sM\n' "${mem_used:-?}" "${mem_full:-?}"
