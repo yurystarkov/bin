@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# colcol: collect colors
+# depends on convert(1)
+#
+# by yury; in the public domain
+
+[ "$1" ] || {
+  printf 'usage: %s <hex color>\n' "${0##*/}"
+  exit 0
+}
+
+col_hex="$1"
+col_img="$HOME/dl/images/colors/#$col_hex.png"
+
+convert -size 100x100 "xc:#$col_hex" "$col_img"
