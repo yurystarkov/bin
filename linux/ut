@@ -1,0 +1,17 @@
+#!/bin/sh
+#
+# ut: human-readable uptime
+#
+# by yury; in the public domain
+
+IFS=. read -r s _ </proc/uptime
+
+d=$((s / 60 / 60 / 24))
+h=$((s / 60 / 60 % 24))
+m=$((s / 60 % 60))
+
+case "$d" in [!0]*) uptime="${uptime}${d}d " ;; esac
+case "$h" in [!0]*) uptime="${uptime}${h}h " ;; esac
+case "$m" in [!0]*) uptime="${uptime}${m}m " ;; esac
+
+printf '%s\n' "${uptime:-0m}"
