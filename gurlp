@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# gurlp: grep urls
+#
+# by yury; in the public domain
+
+prot='[a-zA-Z]+://'
+host='[-a-zA-Z0-9._+]+'
+path='[-a-zA-Z0-9._+#=?&:;%/!~()]+'
+
+grep --extended-regexp \
+     --only-matching \
+     "${prot}${host}${path}" "$@"
