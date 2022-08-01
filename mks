@@ -1,0 +1,26 @@
+#!/bin/sh
+#
+# mks: make a shell script
+#
+# by yury; in the public domain
+
+name="${1##*/}"
+desc="$(shift; echo "$*")"
+
+mkdir -p "${BIN_DIR:=$HOME/my/code/bin}" ||
+  { printf 'ERROR: could not create %s' "$BIN_DIR"; exit 1; }
+
+printf '#!/bin/sh
+#
+# %s: %s
+#
+# by %s; in the public domain
+
+set -e # exit if a command failes
+set -u # treat unset variables as an error, and immediately exit
+set -f # disable globbing
+' "$name" "$desc" "$USER" > "${script:=$BIN_DIR/$1}"
+
+chmod +x "$script"
+
+"${VISUAL:-$EDITOR}" "$script"

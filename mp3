@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# mp3: download an mp3
+# depends on youtube-dl(1)
+#
+# by yury; in the public domain
+
+youtube-dl \
+  --extract-audio \
+  --embed-thumbnail \
+  --audio-format mp3 \
+  "$@"

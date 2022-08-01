@@ -1,0 +1,93 @@
+#!/bin/sh
+#
+# pasta: post to a pastebin
+# depends on curl(1)
+#
+# by yury; in the public domain
+
+usage() {
+  printf 'usage: %s <service> [file]
+services:
+  0x0, catbox, clbin, dmca, dumpz, ix,
+  iotek, sprunge, termbin, ttm, uguu.\n' "${0##*/}"
+  exit 0
+}
+
+log() {
+  printf '\033[0;3%sm%s:\033[0m %s\n' \
+    "$1" "$2" "$3" >&2
+}
+
+die() {
+  log '1' 'ERROR' "$1"
+  exit 1
+}
+
+main() {
+  [ "${input:="${2:-/dev/stdin}"}" ] ||
+    die 'there is nothing to send.'
+
+  : "${PASTA_UA:='curl/7.69.1'}"
+
+  case "$1" in
+
+  '0x0')
+    curl -A "$PASTA_UA" -sF 'file=@-' 'https://0x0.st' < "$input"
+  ;;
+
+  'catbox')
+    curl -A "$PASTA_UA" -sF 'reqtype=fileupload' -F 'fileToUpload=@-' \
+      'https://catbox.moe/user/api.php' < "$input"
+  ;;
+
+  'clbin')
+    curl -A "$PASTA_UA" -sF 'clbin=<-' 'https://clbin.com' < "$input"
+  ;;
+
+  'dmca')
+    curl -A "$PASTA_UA" -sF 'files[]=@-' 'http://dmca.gripe/api/upload' <"$input" |
+      grep -Po '"url":"[A-Za-z0-9]+.*?"' |
+      sed 's/"url":"//;s/"//;s/[\]//g'
+  ;;
+
+  'dumpz')
+    curl -A "$PASTA_UA" -s --data-binary @- 'https://dumpz.org' <"$input" |
+      sed 's/http/&s/;s!$!/text/!'
+  ;;
+
+  'iotek')
+    curl -A "$PASTA_UA" -sT- 'https://p.iotek.org' <"$input"
+  ;;
+
+  'ix')
+    curl -A "$PASTA_UA" -sF 'f:1=<-' 'http://ix.io' <"$input"
+  ;;
+
+  'lewd')
+    curl -A "$PASTA_UA" -sF 'file=@-' 'https://lewd.se/api.php?d=upload-tool' <"$input"
+  ;;
+
+  'sprunge')
+    curl -A "$PASTA_UA" -sF 'sprunge=<-' 'http://sprunge.us' <"$input"
+  ;;
+
+  'termbin')
+    nc 'termbin.com' 9999 <"$input"
+  ;;
+
+  'ttm')
+    curl -A "$PASTA_UA" -F'file=@-' 'https://ttm.sh' <"$input"
+  ;;
+
+  'uguu')
+    curl -A "$PASTA_UA" -sF 'file=@-' 'https://uguu.se/api.php?d=upload-tool' <"$input"
+  ;;
+
+  *)
+    usage
+  ;;
+
+  esac | tee -a "${PASTA_LOG:-$HOME/.pasta_history}"
+}
+
+[ "$1" ] || usage && main "$@"
