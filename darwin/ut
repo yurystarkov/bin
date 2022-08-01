@@ -1,0 +1,22 @@
+#!/bin/sh
+#
+# wasted: human-readable uptime
+#
+# by yury; in the public domain
+
+s=$(sysctl -n kern.boottime)
+
+s=${s#*=}
+s=${s%,*}
+
+s=$(($(date +%s) - s))
+
+d=$((s / 60 / 60 / 24))
+h=$((s / 60 / 60 % 24))
+m=$((s / 60 % 60))
+
+[ "$d" = 0 ] || uptime="${uptime}${d}d "
+[ "$h" = 0 ] || uptime="${uptime}${h}h "
+[ "$m" = 0 ] || uptime="${uptime}${m}m "
+
+printf '%s\n' "${uptime:-0m}"
