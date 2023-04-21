@@ -21,13 +21,13 @@ die() {
   exit 1
 }
 
-enc_sec() {
-  age --encrypt --output "$sec_path" --recipient "$DAY_REC"
+enc() {
+  age --encrypt --output "$day" --recipient "$DAY_REC"
 }
 
-dec_sec() {
-  [ -f "$sec_path" ] ||
-    die "$ser_name/$sec_name is not present."
+dec() {
+  [ -f "$day" ] ||
+    die "${day} is not present."
 
   # check if clear key exists
   if [ ! -s "${key:=${DAY_KEY%%.age}}" ]; then
@@ -39,32 +39,24 @@ dec_sec() {
     } &
   fi
 
-  age --decrypt --identity "$key" --output - "$sec_path"
+  age --decrypt --identity "$key" --output - "$day"
 }
 
-edit_sec() {
-  : "${sec_clear:=$(mktemp)}"
-  mkdir -p "$ser_path"
-  if [ -f "$sec_path" ]; then
-    dec_sec > "$sec_clear" ||
-      die "unable to decrypt $ser_name/$sec_name."
+edit() {
+  : "${cleartext:=$(mktemp)}"
+  mkdir -p "$yearmonth"
+  if [ -f "$day" ]; then
+    dec > "$cleartext" ||
+      die "unable to decrypt ${day}."
   fi
-  "${VISUAL:-$EDITOR}" "$sec_clear"
+  "${VISUAL:-$EDITOR}" "$cleartext"
   # shellcheck disable=2002
-  cat "$sec_clear" | enc_sec
-  rm -f "$sec_clear"
-}
-
-init() {
-  # initialize service and secret variables
-  : "${ser_name:=${1##*://}}"
-  : "${sec_name:=${2:-pass}}"
-  : "${ser_path:=${DAY_DIR}/${ser_name}}"
-  : "${sec_path:=${ser_path}/${sec_name}.age}"
+  cat "$cleartext" | enc
+  rm -f "$cleartext"
 }
 
 main() {
-  mkdir -p "${DAY_DIR:=$HOME/.safe}" ||
+  mkdir -p "${DAY_DIR:=$HOME/.day}" ||
     die "could not create ${0##*/} directory."
 
   cd "$DAY_DIR" ||
@@ -93,9 +85,9 @@ main() {
     set -- $(date +'%y %m %d')
   fi
 
-  year=$1 month=$2 day=$3
-  init "$year/$month" "$day"
-  edit_sec
+  : "${yearmonth:=${DAY_DIR}/${1}/${2}}"
+  : "${day:=${yearmonth}/${3}.age}"
+  edit
 }
 
 set +x # disable debug mode
