@@ -21,10 +21,6 @@ die() {
   exit 1
 }
 
-war() {
-  log "$1" 'WARNING' '3'
-}
-
 enc_sec() {
   age --encrypt --output "$sec_path" --recipient "$DAY_REC"
 }
@@ -34,14 +30,14 @@ dec_sec() {
     die "$ser_name/$sec_name is not present."
 
   # check if clear key exists
-  if [ ! -s "${key:=${DAY_KEY%%.age}}" ]; then 
+  if [ ! -s "${key:=${DAY_KEY%%.age}}" ]; then
     age --decrypt "$DAY_KEY" > "$key" || exit 1
 
     {
       sleep "${DAY_TIMEOUT:-120}" || kill 0
       rm -f "$key"
     } &
-  fi 
+  fi
 
   age --decrypt --identity "$key" --output - "$sec_path"
 }
