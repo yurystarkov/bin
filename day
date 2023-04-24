@@ -87,11 +87,14 @@ main() {
 
   : "${yearmonth:=${DAY_DIR}/${1}/${2}}"
   : "${day:=${yearmonth}/${3}.age}"
+
   edit
 }
 
-set +x # disable debug mode
-set -f # disable globbing
-set -e # disable globbing
+# disable debug mode to prevent leakage
+set +x
+
+# disable globbing to avoid word-splitting
+set -f
 
 main "$@"
