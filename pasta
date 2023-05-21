@@ -23,6 +23,58 @@ die() {
   exit 1
 }
 
+OxO() {
+  curl -A "$PASTA_UA" -sF 'file=@-' 'https://0x0.st' < "$input"
+}
+
+catbox() {
+  curl -A "$PASTA_UA" -sF 'reqtype=fileupload' -F 'fileToUpload=@-' \
+    'https://catbox.moe/user/api.php' < "$input"
+}
+
+clbin() {
+  curl -A "$PASTA_UA" -sF 'clbin=<-' 'https://clbin.com' < "$input"
+}
+
+dmca() {
+  curl -A "$PASTA_UA" -sF 'files[]=@-' 'http://dmca.gripe/api/upload' <"$input" |
+    grep -Po '"url":"[A-Za-z0-9]+.*?"' |
+    sed 's/"url":"//;s/"//;s/[\]//g'
+}
+
+dumpz() {
+  curl -A "$PASTA_UA" -s --data-binary @- 'https://dumpz.org' <"$input" |
+    sed 's/http/&s/;s!$!/text/!'
+}
+
+iotek() {
+  curl -A "$PASTA_UA" -sT- 'https://p.iotek.org' <"$input"
+}
+
+ix() {
+  curl -A "$PASTA_UA" -sF 'f:1=<-' 'http://ix.io' <"$input"
+}
+
+lewd() {
+  curl -A "$PASTA_UA" -sF 'file=@-' 'https://lewd.se/api.php?d=upload-tool' <"$input"
+}
+
+sprunge() {
+  curl -A "$PASTA_UA" -sF 'sprunge=<-' 'http://sprunge.us' <"$input"
+}
+
+termbin() {
+  nc 'termbin.com' 9999 <"$input"
+}
+
+ttm() {
+  curl -A "$PASTA_UA" -F'file=@-' 'https://ttm.sh' <"$input"
+}
+
+uguu() {
+  curl -A "$PASTA_UA" -sF 'file=@-' 'https://uguu.se/api.php?d=upload-tool' <"$input"
+}
+
 main() {
   [ "${input:="${2:-/dev/stdin}"}" ] ||
     die 'there is nothing to send.'
@@ -31,61 +83,19 @@ main() {
 
   case "$1" in
 
-  '0x0')
-    curl -A "$PASTA_UA" -sF 'file=@-' 'https://0x0.st' < "$input"
-  ;;
-
-  'catbox')
-    curl -A "$PASTA_UA" -sF 'reqtype=fileupload' -F 'fileToUpload=@-' \
-      'https://catbox.moe/user/api.php' < "$input"
-  ;;
-
-  'clbin')
-    curl -A "$PASTA_UA" -sF 'clbin=<-' 'https://clbin.com' < "$input"
-  ;;
-
-  'dmca')
-    curl -A "$PASTA_UA" -sF 'files[]=@-' 'http://dmca.gripe/api/upload' <"$input" |
-      grep -Po '"url":"[A-Za-z0-9]+.*?"' |
-      sed 's/"url":"//;s/"//;s/[\]//g'
-  ;;
-
-  'dumpz')
-    curl -A "$PASTA_UA" -s --data-binary @- 'https://dumpz.org' <"$input" |
-      sed 's/http/&s/;s!$!/text/!'
-  ;;
-
-  'iotek')
-    curl -A "$PASTA_UA" -sT- 'https://p.iotek.org' <"$input"
-  ;;
-
-  'ix')
-    curl -A "$PASTA_UA" -sF 'f:1=<-' 'http://ix.io' <"$input"
-  ;;
-
-  'lewd')
-    curl -A "$PASTA_UA" -sF 'file=@-' 'https://lewd.se/api.php?d=upload-tool' <"$input"
-  ;;
-
-  'sprunge')
-    curl -A "$PASTA_UA" -sF 'sprunge=<-' 'http://sprunge.us' <"$input"
-  ;;
-
-  'termbin')
-    nc 'termbin.com' 9999 <"$input"
-  ;;
-
-  'ttm')
-    curl -A "$PASTA_UA" -F'file=@-' 'https://ttm.sh' <"$input"
-  ;;
-
-  'uguu')
-    curl -A "$PASTA_UA" -sF 'file=@-' 'https://uguu.se/api.php?d=upload-tool' <"$input"
-  ;;
-
-  *)
-    usage
-  ;;
+  '0x0')     OxO     ;;
+  'catbox')  catbox  ;;
+  'clbin')   clbin   ;;
+  'dmca')    dmca    ;;
+  'dumpz')   dumpz   ;;
+  'iotek')   iotek   ;;
+  'ix')      ix      ;;
+  'lewd')    lewd    ;;
+  'sprunge') sprunge ;;
+  'termbin') termbin ;;
+  'ttm')     ttm     ;;
+  'uguu')    uguu    ;;
+  *)         usage   ;;
 
   esac | tee -a "${PASTA_LOG:-$HOME/.pasta_history}"
 }
