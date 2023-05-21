@@ -83,19 +83,19 @@ main() {
 
   case "$1" in
 
-  '0x0')     OxO     ;;
-  'catbox')  catbox  ;;
-  'clbin')   clbin   ;;
-  'dmca')    dmca    ;;
-  'dumpz')   dumpz   ;;
-  'iotek')   iotek   ;;
-  'ix')      ix      ;;
-  'lewd')    lewd    ;;
+  '0x0'    ) OxO     ;;
+  'catbox' ) catbox  ;;
+  'clbin'  ) clbin   ;;
+  'dmca'   ) dmca    ;;
+  'dumpz'  ) dumpz   ;;
+  'iotek'  ) iotek   ;;
+  'ix'     ) ix      ;;
+  'lewd'   ) lewd    ;;
   'sprunge') sprunge ;;
   'termbin') termbin ;;
-  'ttm')     ttm     ;;
-  'uguu')    uguu    ;;
-  *)         usage   ;;
+  'ttm'    ) ttm     ;;
+  'uguu'   ) uguu    ;;
+  *        ) usage   ;;
 
   esac | tee -a "${PASTA_LOG:-$HOME/.pasta_history}"
 }
