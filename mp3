@@ -5,7 +5,7 @@
 #
 # by yury; in the public domain
 
-youtube-dl \
+${YOUTUBE_DL:-yt-dlp} \
   --extract-audio \
   --embed-thumbnail \
   --audio-format mp3 \
