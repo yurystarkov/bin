@@ -38,8 +38,7 @@ clbin() {
 
 dmca() {
   curl -A "$PASTA_UA" -sF 'files[]=@-' 'http://dmca.gripe/api/upload' <"$input" |
-    grep -Po '"url":"[A-Za-z0-9]+.*?"' |
-    sed 's/"url":"//;s/"//;s/[\]//g'
+    grep -Po '"url":"[A-Za-z0-9]+.*?"' | sed 's/"url":"//;s/"//;s/[\]//g'
 }
 
 dumpz() {
