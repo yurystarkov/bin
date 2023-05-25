@@ -96,6 +96,7 @@ main() {
   'uguu'   ) uguu    ;;
   *        ) usage   ;;
 
+  # you can disable logging by setting PASTA_LOG to /dev/null
   esac | tee -a "${PASTA_LOG:-$HOME/.pasta_history}"
 }
 
