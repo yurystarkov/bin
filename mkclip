@@ -10,16 +10,16 @@
   exit 0
 }
 
-ffmpeg \
-  -i "$1" \
-  -f image2 \
-  -loop 1 \
-  -r 25 \
-  -i "$2" \
+ffmpeg             \
+  -i "$1"          \
+  -f image2        \
+  -loop 1          \
+  -r 25            \
+  -i "$2"          \
   -vf scale=512:-1 \
-  -shortest \
-  -vcodec libx264 \
+  -shortest        \
+  -vcodec libx264  \
   -pix_fmt yuv420p \
-  -acodec aac \
-  -y \
+  -acodec aac      \
+  -y               \
   -profile:v baseline "${3:-output.mp4}"

@@ -6,15 +6,24 @@
 
 while IFS=':k ' read -r key val _; do
   case $key in
+
   'MemTotal')
     mem_used=$((mem_used + val))
-    mem_full=$val ;;
+    mem_full=$val
+  ;;
+
   'Shmem')
-    mem_used=$((mem_used + val)) ;;
+    mem_used=$((mem_used + val))
+  ;;
+
   'MemFree' | 'Buffers' | 'Cached' | 'SReclaimable')
-    mem_used=$((mem_used - val)) ;;
+    mem_used=$((mem_used - val))
+  ;;
+
   'MemAvailable')
-    mem_avail=$val ;;
+    mem_avail=$val
+  ;;
+
   esac
 done </proc/meminfo
 

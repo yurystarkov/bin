@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# gurlp: grep urls
+# gurlp: grep for urls
 #
 # by yury; in the public domain
 
@@ -9,5 +9,5 @@ host='[-a-zA-Z0-9._+]+'
 path='[-a-zA-Z0-9._+#=?&:;%/!~()]+'
 
 grep --extended-regexp \
-     --only-matching \
+     --only-matching   \
      "${prot}${host}${path}" "$@"

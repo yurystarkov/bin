@@ -6,7 +6,7 @@
 # by yury; in the public domain
 
 ${YOUTUBE_DL:-yt-dlp} \
-  --extract-audio \
-  --embed-thumbnail \
-  --audio-format mp3 \
+  --extract-audio     \
+  --embed-thumbnail   \
+  --audio-format mp3  \
   "$@"
