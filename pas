@@ -16,15 +16,18 @@ log() {
     "${3:-0}" "${2:->}" "$1" >&2
 }
 
+
 die() {
   log "$1" 'ERROR' '1'
   printf '\n'
   exit 1
 }
 
+
 enc() {
   age --encrypt --output "$password_path" --recipient "$rec"
 }
+
 
 enter_password() {
   mkdir -p "$service_path"
@@ -40,6 +43,7 @@ enter_password() {
   printf '%s' "$password" | enc
 }
 
+
 type_password() {
   log "enter$2: "
   stty -echo
@@ -48,10 +52,12 @@ type_password() {
   printf '\n'
 }
 
+
 generate_password() {
   LC_ALL=C tr -dc "${PAS_PATTERN:-_A-Z-a-z-0-9}" </dev/urandom |
     dd ibs=1 obs=1 count="${PAS_LEN:-50}" 2>/dev/null
 }
+
 
 ask_yesno() {
   log "$1 [y/N] "
@@ -74,6 +80,7 @@ show_password() {
   printf '\n'
 }
 
+
 init() {
   # set service and login variables
   : "${service:=${1##*://}}"
@@ -83,6 +90,7 @@ init() {
   : "${service_path:=${PAS_DIR}/${service}}"
   : "${password_path:=${service_path}/${login}.age}"
 }
+
 
 main() {
   # create password store
@@ -120,7 +128,7 @@ main() {
   '') usage ;;
   *)
     init "$@"
-    if [ -f "${password_path}" ]; then
+    if [ -f "$password_path" ]; then
       show_password
     else
       enter_password
@@ -128,6 +136,7 @@ main() {
   ;;
   esac
 }
+
 
 set +x # disable debug mode
 set -f # disable globbing
