@@ -21,23 +21,25 @@ die() {
   exit 1
 }
 
-enter_password() {
+enter_pw() {
   mkdir -p "$service_path"
   if ask_yesno 'generate password?'; then
-    password="$(generate_password)"
+    pw="$(generate_pw)"
   else
-    type_password password
-    type_password password2 ' (again)'
+    type_pw pw
+    type_pw pw2 ' (again)'
     # shellcheck disable=2154 
-    [ "$password" = "$password2" ] || die 'passwords do not match.'
+    [ "$pw" = "$pw2" ] || die 'passwords do not match.'
   fi
-  [ "$password" ] || die 'failed to generate a password.'
-  printf '%s' "$password" |
-    age --encrypt --output "$password_path" --recipient "$rec"
+  [ "$pw" ] || die 'failed to generate a password.'
+
+  read -r rec < "$rec_path"
+  printf '%s' "$pw" |
+    age --encrypt --output "$pw_path" --recipient "$rec"
 
 }
 
-type_password() {
+type_pw() {
   log "enter$2: "
   stty -echo
   read -r "$1"
@@ -45,7 +47,7 @@ type_password() {
   printf '\n'
 }
 
-generate_password() {
+generate_pw() {
   LC_ALL=C tr -dc "${PAS_PATTERN:-_A-Z-a-z-0-9}" </dev/urandom |
     dd ibs=1 obs=1 count="${PAS_LEN:-50}" 2>/dev/null
 }
@@ -60,10 +62,10 @@ ask_yesno() {
   return 1
 }
 
-show_password() {
+show_pw() {
   key="$(age --decrypt "$key_path" || exit 1)"
 
-  printf '%s' "$key" | age --decrypt --identity - --output - "$password_path"
+  printf '%s' "$key" | age --decrypt --identity - --output - "$pw_path"
   printf '\n'
 }
 
@@ -74,15 +76,15 @@ init() {
 
   # set service and login paths
   : "${service_path:=${PAS_DIR}/${service}}"
-  : "${password_path:=${service_path}/${login}.age}"
+  : "${pw_path:=${service_path}/${login}.age}"
 }
 
 main() {
-  # create password store
+  # create a password store store
   mkdir -p "${PAS_DIR:=$HOME/my/pas}" ||
     die 'could not create password store.'
 
-  # check if password store is accessible
+  # check if the password store is accessible
   cd "$PAS_DIR" ||
     die 'could not access directory.'
   
@@ -107,22 +109,10 @@ main() {
     printf '%s' "$key" | age-keygen -y > "$rec_path"
   }
 
-  read -r rec < "$rec_path"
-
+  # "ui"
   case "$1" in
-
-  '')
-    usage
-  ;;
-  *)
-    init "$@"
-    if [ -f "$password_path" ]; then
-      show_password
-    else
-      enter_password
-    fi
-  ;;
-
+  '') usage ;;
+  * ) init "$@"; if [ -f "$pw_path" ]; then show_pw; else enter_pw; fi ;;
   esac
 }
 
