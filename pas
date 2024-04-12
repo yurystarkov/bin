@@ -61,9 +61,6 @@ ask_yesno() {
 }
 
 show_password() {
-  [ -f "$password_path" ] ||
-    die "${service}/${login} is not present."
-
   key="$(age --decrypt "$key_path" || exit 1)"
 
   printf '%s' "$key" | age --decrypt --identity - --output - "$password_path"
@@ -113,7 +110,10 @@ main() {
   read -r rec < "$rec_path"
 
   case "$1" in
-  '') usage ;;
+
+  '')
+    usage
+  ;;
   *)
     init "$@"
     if [ -f "$password_path" ]; then
@@ -122,6 +122,7 @@ main() {
       enter_password
     fi
   ;;
+
   esac
 }
 
