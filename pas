@@ -63,9 +63,7 @@ ask_yesno() {
 }
 
 show_pw() {
-  key="$(age --decrypt "$key_path" || exit 1)"
-
-  printf '%s' "$key" | age --decrypt --identity - --output - "$pw_path"
+  age --decrypt "$key_path" | age --decrypt --identity - --output - "$pw_path"
   printf '\n'
 }
 
