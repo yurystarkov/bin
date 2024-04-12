@@ -10,24 +10,16 @@ usage() {
   exit 0
 }
 
-
 log() {
   printf '\033[0;3%sm%s\033[0m %s' \
     "${3:-0}" "${2:->}" "$1" >&2
 }
-
 
 die() {
   log "$1" 'ERROR' '1'
   printf '\n'
   exit 1
 }
-
-
-enc() {
-  age --encrypt --output "$password_path" --recipient "$rec"
-}
-
 
 enter_password() {
   mkdir -p "$service_path"
@@ -40,9 +32,10 @@ enter_password() {
     [ "$password" = "$password2" ] || die 'passwords do not match.'
   fi
   [ "$password" ] || die 'failed to generate a password.'
-  printf '%s' "$password" | enc
-}
+  printf '%s' "$password" |
+    age --encrypt --output "$password_path" --recipient "$rec"
 
+}
 
 type_password() {
   log "enter$2: "
@@ -52,12 +45,10 @@ type_password() {
   printf '\n'
 }
 
-
 generate_password() {
   LC_ALL=C tr -dc "${PAS_PATTERN:-_A-Z-a-z-0-9}" </dev/urandom |
     dd ibs=1 obs=1 count="${PAS_LEN:-50}" 2>/dev/null
 }
-
 
 ask_yesno() {
   log "$1 [y/N] "
@@ -69,7 +60,6 @@ ask_yesno() {
   return 1
 }
 
-
 show_password() {
   [ -f "$password_path" ] ||
     die "${service}/${login} is not present."
@@ -80,7 +70,6 @@ show_password() {
   printf '\n'
 }
 
-
 init() {
   # set service and login variables
   : "${service:=${1##*://}}"
@@ -90,7 +79,6 @@ init() {
   : "${service_path:=${PAS_DIR}/${service}}"
   : "${password_path:=${service_path}/${login}.age}"
 }
-
 
 main() {
   # create password store
@@ -136,7 +124,6 @@ main() {
   ;;
   esac
 }
-
 
 set +x # disable debug mode
 set -f # disable globbing
