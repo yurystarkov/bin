@@ -5,6 +5,11 @@
 #
 # by yury; in the public domain
 
+usage() {
+  printf 'usage: %s [-h] [yy/mm/dd]\n' "${0##*/}"
+  exit 0
+}
+
 log() {
   printf '\033[0;3%sm%s\033[0m %s' \
     "${3:-0}" "${2:->}" "$1" >&2
@@ -16,65 +21,72 @@ die() {
   exit 1
 }
 
-# disable debug mode to prevent leakage
-set +x
+main() {
+  # disable debug mode to prevent leakage
+  set +x
 
-# disable globbing to avoid word-splitting
-set -f
+  # disable globbing to avoid word-splitting
+  set -f
 
-# create journal directory
-mkdir -p "${DAY_DIR:=$HOME/my/day}" ||
-  die "could not create journal directory."
+  # create journal directory
+  mkdir -p "${DAY_DIR:=$HOME/my/day}" ||
+    die "could not create journal directory."
 
-# check if journal directory is accessible
-cd "$DAY_DIR" ||
-  die 'could not access directory.'
+  # check if journal directory is accessible
+  cd "$DAY_DIR" ||
+    die 'could not access directory.'
 
-# restrict permissions of any new files to only the current user
-umask 077
+  # restrict permissions of any new files to only the current user
+  umask 077
 
-# leave terminal usable after exit or Ctrl+C
-[ -t 1 ] &&
-  trap 'stty echo icanon' INT EXIT
+  # leave terminal usable after exit or Ctrl+C
+  [ -t 1 ] &&
+    trap 'stty echo icanon' INT EXIT
 
-# set a key
-[ -f "${key_path:=${DAY_DIR}/.key.age}" ] || {
-  key="$(age-keygen)"
-  printf '%s' "$key" | age -p > "${key_path}"
-}
+  # set a key
+  [ -f "${key_path:=${DAY_DIR}/.key.age}" ] || {
+    key="$(age-keygen)"
+    printf '%s' "$key" | age -p > "${key_path}"
+  }
 
-# set a recepient
-[ -f "${rec_path:=${DAY_DIR}/.rec}" ] || {
-  [ -z "$key" ] && {
+  # set a recepient
+  [ -f "${rec_path:=${DAY_DIR}/.rec}" ] || {
+    [ -z "$key" ] && {
     key="$(age -d "${key_path}")"
   }
   printf '%s' "$key" | age-keygen -y > "$rec_path"
+  }
+
+  read -r rec < "$rec_path"
+
+  if [ "$1" ]; then
+    IFS=/
+    # shellcheck disable=2086
+    set -- $1
+  else
+    # shellcheck disable=2046
+    set -- $(date +'%y %m %d')
+  fi
+
+  : "${yearmonth:=${DAY_DIR}/${1}/${2}}"
+  : "${day:=${yearmonth}/${3}.age}"
+
+  : "${cleartext:=$(mktemp)}"
+
+  mkdir -p "$yearmonth"
+
+  if [ -f "$day" ]; then
+    age --decrypt "$key_path" | age --decrypt --identity - --output "$cleartext" "$day" ||
+      die "unable to decrypt ${day}."
+  fi
+
+  "${VISUAL:-$EDITOR}" "$cleartext"
+  # shellcheck disable=2002
+  cat "$cleartext" | age --encrypt --output "$day" --recipient "$rec"
+  rm -f "$cleartext"
 }
 
-read -r rec < "$rec_path"
-
-if [ "$1" ]; then
-  IFS=/
-  # shellcheck disable=2086
-  set -- $1
-else
-  # shellcheck disable=2046
-  set -- $(date +'%y %m %d')
-fi
-
-: "${yearmonth:=${DAY_DIR}/${1}/${2}}"
-: "${day:=${yearmonth}/${3}.age}"
-
-: "${cleartext:=$(mktemp)}"
-
-mkdir -p "$yearmonth"
-
-if [ -f "$day" ]; then
-  age --decrypt "$key_path" | age --decrypt --identity - --output "$cleartext" "$day" ||
-    die "unable to decrypt ${day}."
-fi
-
-"${VISUAL:-$EDITOR}" "$cleartext"
-# shellcheck disable=2002
-cat "$cleartext" | age --encrypt --output "$day" --recipient "$rec"
-rm -f "$cleartext"
+case "$1" in
+'-h') usage     ;;
+*   ) main "$@" ;;
+esac
