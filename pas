@@ -36,7 +36,6 @@ enter_pw() {
   read -r rec < "$rec_path"
   printf '%s' "$pw" |
     age --encrypt --output "$pw_path" --recipient "$rec"
-
 }
 
 type_pw() {
