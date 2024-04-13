@@ -67,16 +67,6 @@ show_pw() {
   printf '\n'
 }
 
-init() {
-  # set service and login variables
-  : "${service:=${1##*://}}"
-  : "${login:=${2:-_}}"
-
-  # set service and login paths
-  : "${service_path:=${PAS_DIR}/${service}}"
-  : "${pw_path:=${service_path}/${login}.age}"
-}
-
 main() {
   # disable debug mode
   set +x
@@ -113,7 +103,13 @@ main() {
     printf '%s' "$key" | age-keygen -y > "$rec_path"
   }
 
-  init "$@"
+  # set service and login variables
+  : "${service:=${1##*://}}"
+  : "${login:=${2:-_}}"
+
+  # set service and login paths
+  : "${service_path:=${PAS_DIR}/${service}}"
+  : "${pw_path:=${service_path}/${login}.age}"
 
   if [ -f "$pw_path" ]; then
     show_pw
