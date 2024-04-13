@@ -78,6 +78,12 @@ init() {
 }
 
 main() {
+  # disable debug mode
+  set +x
+
+  # disable globbing
+  set -f
+
   # create a password store store
   mkdir -p "${PAS_DIR:=$HOME/my/pas}" ||
     die 'could not create password store.'
@@ -107,14 +113,16 @@ main() {
     printf '%s' "$key" | age-keygen -y > "$rec_path"
   }
 
-  # "ui"
-  case "$1" in
-  '') usage ;;
-  * ) init "$@"; if [ -f "$pw_path" ]; then show_pw; else enter_pw; fi ;;
-  esac
+  init "$@"
+
+  if [ -f "$pw_path" ]; then
+    show_pw
+  else
+    enter_pw
+  fi
 }
 
-set +x # disable debug mode
-set -f # disable globbing
-
-main "$@"
+case "$1" in
+'') usage     ;;
+* ) main "$@" ;;
+esac
