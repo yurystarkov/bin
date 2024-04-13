@@ -68,21 +68,21 @@ main() {
     set -- $(date +'%y %m %d')
   fi
 
-  : "${yearmonth:=${DAY_DIR}/${1}/${2}}"
-  : "${day:=${yearmonth}/${3}.age}"
+  : "${yearmonth_path:=${DAY_DIR}/${1}/${2}}"
+  : "${day_path:=${yearmonth_path}/${3}.age}"
 
   : "${cleartext:=$(mktemp)}"
 
-  mkdir -p "$yearmonth"
+  mkdir -p "$yearmonth_path"
 
-  if [ -f "$day" ]; then
-    age --decrypt "$key_path" | age --decrypt --identity - --output "$cleartext" "$day" ||
-      die "unable to decrypt ${day}."
+  if [ -f "$day_path" ]; then
+    age --decrypt "$key_path" | age --decrypt --identity - --output "$cleartext" "$day_path" ||
+      die "unable to decrypt ${day_path}."
   fi
 
   "${VISUAL:-$EDITOR}" "$cleartext"
   # shellcheck disable=2002
-  cat "$cleartext" | age --encrypt --output "$day" --recipient "$rec"
+  cat "$cleartext" | age --encrypt --output "$day_path" --recipient "$rec"
   rm -f "$cleartext"
 }
 
