@@ -6,7 +6,9 @@
 # by yury; in the public domain
 
 usage() {
-  printf 'usage: %s [service] [login]\n' "${0##*/}"
+  printf 'usage: %s [service name] [secret name]
+  service name - name of your password bucket, e.g. "github.com" or "github.com/username"
+  secret name  - _ for passwords by default but can be "totp" or "login"\n' "${0##*/}"
   exit 0
 }
 
@@ -104,11 +106,10 @@ main() {
 
   # set service and login variables
   : "${service:=${1##*://}}"
-  : "${login:=${2:-_}}"
 
   # set service and login paths
   : "${service_path:=${PAS_DIR}/${service}}"
-  : "${pw_path:=${service_path}/${login}.age}"
+  : "${pw_path:=${service_path}/${2:-_}.age}"
 
   if [ -f "$pw_path" ]; then
     show_pw
