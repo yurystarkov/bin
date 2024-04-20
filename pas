@@ -104,11 +104,8 @@ main() {
     printf '%s' "$key" | age-keygen -y > "$rec_path"
   }
 
-  # set service and login variables
-  : "${service:=${1##*://}}"
-
   # set service and login paths
-  : "${service_path:=${PAS_DIR}/${service}}"
+  : "${service_path:=${PAS_DIR}/${1##*://}}"
   : "${pw_path:=${service_path}/${2:-_}.age}"
 
   if [ -f "$pw_path" ]; then
