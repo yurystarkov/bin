@@ -1,10 +1,17 @@
+PREFIX ?= /usr/local
+UNAME := $(shell uname -s | tr 'A-Z' 'a-z')
+
 install:
-	install -g 755 day    /usr/local/bin/day
-	install -g 755 pas    /usr/local/bin/pas
-	install -g 755 _      /usr/local/bin/_
-	install -g 755 colcol /usr/local/bin/colcol
-	install -g 755 gurlp  /usr/local/bin/gurlp
-	install -g 755 mks    /usr/local/bin/mks
-	install -g 755 mp3    /usr/local/bin/mp3
-	install -g 755 mkclip /usr/local/bin/mkclip
-	install -g 755 pasta  /usr/local/bin/pasta
+	install -g 755 day          $(DESTDIR)$(PREFIX)/bin/day
+	install -g 755 pas          $(DESTDIR)$(PREFIX)/bin/pas
+	install -g 755 _            $(DESTDIR)$(PREFIX)/bin/_
+	install -g 755 colcol       $(DESTDIR)$(PREFIX)/bin/colcol
+	install -g 755 gurlp        $(DESTDIR)$(PREFIX)/bin/gurlp
+	install -g 755 mks          $(DESTDIR)$(PREFIX)/bin/mks
+	install -g 755 mp3          $(DESTDIR)$(PREFIX)/bin/mp3
+	install -g 755 mkclip       $(DESTDIR)$(PREFIX)/bin/mkclip
+	install -g 755 pasta        $(DESTDIR)$(PREFIX)/bin/pasta
+	install -g 755 pasta        $(DESTDIR)$(PREFIX)/bin/pasta
+	install -g 755 $(UNAME)/ram $(DESTDIR)$(PREFIX)/bin/ram
+	install -g 755 $(UNAME)/ut  $(DESTDIR)$(PREFIX)/bin/ut
+	install -g 755 $(UNAME)/ss  $(DESTDIR)$(PREFIX)/bin/ram
