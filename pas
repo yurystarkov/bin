@@ -25,7 +25,7 @@ die() {
 
 enter_pw() {
   mkdir -p "$service_path"
-  if ask_yesno 'generate password?'; then
+  if ask_yn 'generate password?'; then
     pw="$(generate_pw)"
   else
     type_pw pw
@@ -53,7 +53,7 @@ generate_pw() {
     dd ibs=1 obs=1 count="${PAS_LEN:-50}" 2>/dev/null
 }
 
-ask_yesno() {
+ask_yn() {
   log "$1 [y/N] "
   stty -icanon
   yn=$(dd ibs=1 count=1 2>/dev/null)
