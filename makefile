@@ -1,20 +1,10 @@
 install:
-	cp day    /usr/local/bin/day
-	cp pas    /usr/local/bin/pas
-	cp _      /usr/local/bin/_
-	cp colcol /usr/local/bin/colcol
-	cp gurlp  /usr/local/bin/gurlp
-	cp mks    /usr/local/bin/mks
-	cp mp3    /usr/local/bin/mp3
-	cp mkclip /usr/local/bin/mkclip
-	cp pasta  /usr/local/bin/pasta
-
-	chmod 755 /usr/local/bin/day
-	chmod 755 /usr/local/bin/pas
-	chmod 755 /usr/local/bin/_
-	chmod 755 /usr/local/bin/colcol
-	chmod 755 /usr/local/bin/gurlp
-	chmod 755 /usr/local/bin/mks
-	chmod 755 /usr/local/bin/mp3
-	chmod 755 /usr/local/bin/mkclip
-	chmod 755 /usr/local/bin/pasta
+	install -g 755 day    /usr/local/bin/day
+	install -g 755 pas    /usr/local/bin/pas
+	install -g 755 _      /usr/local/bin/_
+	install -g 755 colcol /usr/local/bin/colcol
+	install -g 755 gurlp  /usr/local/bin/gurlp
+	install -g 755 mks    /usr/local/bin/mks
+	install -g 755 mp3    /usr/local/bin/mp3
+	install -g 755 mkclip /usr/local/bin/mkclip
+	install -g 755 pasta  /usr/local/bin/pasta
