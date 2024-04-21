@@ -76,7 +76,7 @@ show_secret() {
     } &
   fi
 
-  read -r cleartext < "$cleartext_path"
+  read -r cleartext < "$cleartext_path" || die 'failed to read the secret password'
     
   printf '%s\n' "$cleartext"
 }
