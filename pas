@@ -23,7 +23,7 @@ die() {
   exit 1
 }
 
-enter_pw() {
+enter_secret() {
   mkdir -p "$service_path"
   if ask_yn 'generate password?'; then
     pw="$(generate_pw)"
@@ -37,7 +37,7 @@ enter_pw() {
 
   read -r rec < "$rec_path"
   printf '%s' "$pw" |
-    age --encrypt --output "$pw_path" --recipient "$rec"
+    age --encrypt --output "$secret_path" --recipient "$rec"
 }
 
 type_pw() {
@@ -63,9 +63,22 @@ ask_yn() {
   return 1
 }
 
-show_pw() {
-  age --decrypt "$key_path" | age --decrypt --identity - --output - "$pw_path"
-  printf '\n'
+show_secret() {
+  : "${cleartext_path:=${service_path}/${secret_name}.txt}"
+
+  if [ ! -s "$cleartext_path" ]; then
+    age --decrypt "$key_path" |
+      age --decrypt --identity - --output "$cleartext_path" "$secret_path"
+
+    {
+      sleep "${PAS_TIMEOUT:-120}" || kill 0
+      rm -f "$cleartext_path"
+    } &
+  fi
+
+  read -r cleartext < "$cleartext_path"
+    
+  printf '%s\n' "$cleartext"
 }
 
 main() {
@@ -104,14 +117,18 @@ main() {
     printf '%s' "$key" | age-keygen -y > "$rec_path"
   }
 
-  # set service and login paths
-  : "${service_path:=${PAS_DIR}/${1##*://}}"
-  : "${pw_path:=${service_path}/${2:-_}.age}"
+  # set secret and service variables
+  : "${service_name:=${1##*://}}"
+  : "${secret_name:=${2:-_}}"
 
-  if [ -f "$pw_path" ]; then
-    show_pw
+  # set service and secret paths
+  : "${service_path:=${PAS_DIR}/${service_name}}"
+  : "${secret_path:=${service_path}/${secret_name}.age}"
+
+  if [ -f "$secret_path" ]; then
+    show_secret
   else
-    enter_pw
+    enter_secret
   fi
 }
 
