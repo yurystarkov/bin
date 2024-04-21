@@ -66,6 +66,10 @@ ask_yn() {
 show_secret() {
   : "${cleartext_path:=${service_path}/${secret_name}.txt}"
 
+  if ! pgrep -x sleep > /dev/null; then
+    rm -f "$cleartext_path"
+  fi
+
   if [ ! -s "$cleartext_path" ]; then
     age --decrypt "$key_path" |
       age --decrypt --identity - --output "$cleartext_path" "$secret_path"
@@ -76,7 +80,7 @@ show_secret() {
     } &
   fi
 
-  read -r cleartext < "$cleartext_path" || die 'failed to read the secret password'
+  read -r cleartext < "$cleartext_path"
     
   printf '%s\n' "$cleartext"
 }
