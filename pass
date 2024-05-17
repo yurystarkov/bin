@@ -90,6 +90,9 @@ main() {
   # disable globbing
   set -f
 
+  # exit if command fails
+  set -e
+
   # create a password store store
   mkdir -p "${PASS_DIR:=$HOME/my/pass}" ||
     die 'could not create password store.'
@@ -107,7 +110,7 @@ main() {
 
   # set a key
   [ -f "${key_path:=${PASS_DIR}/.key.age}" ] || {
-    key="$(age-keygen || die 'failed to create the key')"
+    key="$(age-keygen)"
     printf '%s' "$key" | age -p > "${key_path}"
   }
 
