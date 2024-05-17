@@ -6,9 +6,7 @@
 # by yury; in the public domain
 
 usage() {
-  printf 'usage: %s [service name] [secret name]
-  service name - name of your password bucket, e.g. "github.com" or "github.com/username"
-  secret name  - _ for passwords by default but can be "totp" or "login"\n' "${0##*/}"
+  printf 'usage: %s service [secret]\n' "${0##*/}"
   exit 0
 }
 
@@ -49,8 +47,8 @@ type_pw() {
 }
 
 generate_pw() {
-  LC_ALL=C tr -dc "${PAS_PATTERN:-_A-Z-a-z-0-9}" </dev/urandom |
-    dd ibs=1 obs=1 count="${PAS_LEN:-50}" 2>/dev/null
+  LC_ALL=C tr -dc "${PASS_PATTERN:-_A-Z-a-z-0-9}" </dev/urandom |
+    dd ibs=1 obs=1 count="${PASS_LEN:-50}" 2>/dev/null
 }
 
 ask_yn() {
@@ -66,7 +64,7 @@ ask_yn() {
 show_secret() {
   : "${cleartext_path:=${service_path}/${secret_name}.txt}"
 
-  if ! pgrep -x sleep > /dev/null; then
+  if ! pgrep -x 'pass_sleep' > /dev/null; then
     rm -f "$cleartext_path"
   fi
 
@@ -75,7 +73,7 @@ show_secret() {
       age --decrypt --identity - --output "$cleartext_path" "$secret_path"
 
     {
-      sleep "${PAS_TIMEOUT:-120}" || kill 0
+      exec -a 'pass_sleep' sleep "${PASS_TIMEOUT:-120}" || kill 0
       rm -f "$cleartext_path"
     } &
   fi
@@ -93,11 +91,11 @@ main() {
   set -f
 
   # create a password store store
-  mkdir -p "${PAS_DIR:=$HOME/my/pas}" ||
+  mkdir -p "${PASS_DIR:=$HOME/my/pass}" ||
     die 'could not create password store.'
 
   # check if the password store is accessible
-  cd "$PAS_DIR" ||
+  cd "$PASS_DIR" ||
     die 'could not access directory.'
   
   # restrict permissions of any new files to only the current user
@@ -108,13 +106,13 @@ main() {
     trap 'stty echo icanon' INT EXIT
 
   # set a key
-  [ -f "${key_path:=${PAS_DIR}/.key.age}" ] || {
-    key="$(age-keygen)"
+  [ -f "${key_path:=${PASS_DIR}/.key.age}" ] || {
+    key="$(age-keygen || die 'failed to create the key')"
     printf '%s' "$key" | age -p > "${key_path}"
   }
 
   # set a recepient
-  [ -f "${rec_path:=${PAS_DIR}/.rec}" ] || {
+  [ -f "${rec_path:=${PASS_DIR}/.rec}" ] || {
     [ -z "$key" ] && {
       key="$(age -d "${key_path}")"
     }
@@ -123,10 +121,10 @@ main() {
 
   # set secret and service variables
   : "${service_name:=${1##*://}}"
-  : "${secret_name:=${2:-_}}"
+  : "${secret_name:=${2:-pass}}"
 
   # set service and secret paths
-  : "${service_path:=${PAS_DIR}/${service_name}}"
+  : "${service_path:=${PASS_DIR}/${service_name}}"
   : "${secret_path:=${service_path}/${secret_name}.age}"
 
   if [ -f "$secret_path" ]; then
