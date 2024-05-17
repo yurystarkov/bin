@@ -64,7 +64,7 @@ ask_yn() {
 show_secret() {
   : "${cleartext_path:=${service_path}/${secret_name}.txt}"
 
-  if ! pgrep -x 'pass_sleep' > /dev/null; then
+  if ! pgrep -x -f "sleep ${PASS_TIMEOUT:-120}" > /dev/null; then
     rm -f "$cleartext_path"
   fi
 
@@ -73,7 +73,7 @@ show_secret() {
       age --decrypt --identity - --output "$cleartext_path" "$secret_path"
 
     {
-      exec -a 'pass_sleep' sleep "${PASS_TIMEOUT:-120}" || kill 0
+      sleep "${PASS_TIMEOUT:-120}" || kill 0
       rm -f "$cleartext_path"
     } &
   fi
