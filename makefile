@@ -3,7 +3,7 @@ UNAME := $(shell uname -s | tr 'A-Z' 'a-z')
 
 install:
 	install -g 755 day          $(DESTDIR)$(PREFIX)/bin/day
-	install -g 755 pas          $(DESTDIR)$(PREFIX)/bin/pas
+	install -g 755 pass         $(DESTDIR)$(PREFIX)/bin/pas
 	install -g 755 _            $(DESTDIR)$(PREFIX)/bin/_
 	install -g 755 colcol       $(DESTDIR)$(PREFIX)/bin/colcol
 	install -g 755 gurlp        $(DESTDIR)$(PREFIX)/bin/gurlp
