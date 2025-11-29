@@ -1,0 +1,30 @@
+#!/bin/sh
+#
+# epub_pkg2file: convert .epub packages to .epub files
+#
+# by yury; in the public domain
+
+die() {
+  log "$1" 'ERROR' '1'
+  printf '\n'
+  exit 1
+}
+
+die_cd() {
+  die "unable to access directory ${1}."
+}
+
+cd "$1" || die_cd "$1"
+
+for pkg in *.epub; do
+  if [ -d "$pkg" ]; then
+    printf 'working on %s\n' "$pkg"
+    cd "$pkg" || die_cd "$pkg"
+    rm -f ./*.plist
+    file="${pkg%.*}_fixed.epub"
+    zip -X -r ../"$file" ./* > /dev/null
+    cd ..
+    rm -rf "$pkg"
+    mv "$file" "$pkg"
+  fi
+done
